@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Zaid Nserat: Data Science & AI, Data Engineer and Full Stack Developer in Amman, Jordan.">
+<title>Zaid Nserat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an MRI reading room. Dark viewer panels, DICOM-style mono annotations,
+   and the four BraTS segmentation label colours used as the page's accent system. */
+:root {
+  --bg: #0b0d10;
+  --panel: #12161b;
+  --panel-2: #171c22;
+  --line: #242b34;
+  --fg: #e7eaee;
+  --muted: #8c96a1;
+  --dim: #5c6670;
+  --et: #4c9aff;     /* enhancing tumor: primary accent */
+  --snfh: #3fd385;   /* edema */
+  --netc: #ff5f52;   /* tumor core */
+  --rc: #ffd23f;     /* resection cavity */
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.625rem;
+  --step-3: 2.25rem;
+  --step-4: clamp(2.75rem, 7vw, 5.25rem);
+  --radius: 6px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--et); outline-offset: 3px; border-radius: 3px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+.mono { font-family: var(--mono); }
+.label {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── nav ── */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { font-family: var(--mono); font-size: var(--step--1); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.brand i { width: 8px; height: 8px; border-radius: 50%; background: var(--snfh); box-shadow: 0 0 10px var(--snfh); }
+.nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; font-size: var(--step--1); }
+.nav ul a { text-decoration: none; color: var(--muted); }
+.nav ul a:hover { color: var(--fg); }
+@media (max-width: 720px) { .nav ul { display: none; } }
+
+/* ── hero ── */
+.hero { padding-block: 64px 48px; }
+.hero .wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+.hero-text { min-width: 0; display: grid; gap: 22px; }
+.hero h1 { font-size: var(--step-4); font-weight: 800; letter-spacing: -0.03em; }
+.hero h1 span { color: var(--muted); font-weight: 500; }
+.roles { display: flex; flex-wrap: wrap; gap: 8px; }
+.role {
+  font-family: var(--mono); font-size: 0.78rem;
+  padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.role i { width: 7px; height: 7px; border-radius: 2px; }
+.lede { color: var(--muted); font-size: var(--step-1); line-height: 1.5; max-width: 34ch; }
+.lede b { color: var(--fg); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  font: 500 var(--step--1) var(--body);
+  padding: 12px 18px; border-radius: var(--radius); text-decoration: none;
+  border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer;
+}
+.btn.primary { background: var(--et); border-color: var(--et); color: #06101f; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary:hover { filter: brightness(1.08); }
+
+/* MRI viewer */
+.viewer {
+  position: relative; aspect-ratio: 1 / 1; max-width: 100%;
+  background: #000; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+}
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.dicom {
+  position: absolute; font-family: var(--mono); font-size: 0.7rem; line-height: 1.5;
+  color: #b9c2cc; pointer-events: none; white-space: nowrap;
+}
+.dicom.tl { top: 12px; left: 14px; }
+.dicom.tr { top: 12px; right: 14px; text-align: right; }
+.dicom.bl { bottom: 12px; left: 14px; }
+.dicom.br { bottom: 12px; right: 14px; text-align: right; }
+.dicom b { color: #fff; font-weight: 500; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px;
+  font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+}
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; }
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .viewer-wrap { max-width: 460px; }
+}
+@media (max-width: 420px) { .dicom { font-size: 0.6rem; } }
+
+/* ── vitals strip ── */
+.vitals { border-block: 1px solid var(--line); background: var(--panel); }
+.vitals .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+.vital { padding-block: 22px; padding-inline: 20px; border-left: 1px solid var(--line); min-width: 0; }
+.vital:first-child { border-left: 0; padding-left: 0; }
+.vital strong { display: block; font-family: var(--display); font-size: var(--step-3); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.vital span { font-size: var(--step--1); color: var(--muted); }
+@media (max-width: 720px) {
+  .vitals .wrap { grid-template-columns: 1fr 1fr; }
+  .vital { border-left: 0; padding-left: 0; }
+  .vital:nth-child(even) { border-left: 1px solid var(--line); padding-left: 20px; }
+  .vital:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* ── sections ── */
+section.block { padding-block: 88px 8px; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 36px; }
+.sec-head h2 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.02em; }
+.sec-head p { color: var(--muted); max-width: 60ch; }
+
+/* research */
+.research { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; min-width: 0; }
+.paper-title { font-size: var(--step-2); font-weight: 700; letter-spacing: -0.01em; margin-block: 12px 14px; }
+.card p { color: var(--muted); }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.facts div { display: grid; gap: 2px; }
+.facts b { font-family: var(--mono); font-weight: 500; font-size: var(--step-0); color: var(--fg); font-variant-numeric: tabular-nums; }
+.facts span { font-size: var(--step--1); color: var(--dim); }
+.my-role { margin-top: 20px; font-size: var(--step--1); color: var(--muted); }
+.my-role b { color: var(--fg); font-weight: 500; }
+
+.dice { display: grid; gap: 22px; }
+.dice-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.dice-big { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 8vw, 4.5rem); letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.bar { display: grid; gap: 8px; }
+.bar-top { display: flex; justify-content: space-between; gap: 12px; font-size: var(--step--1); }
+.bar-top b { font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar-top span { color: var(--muted); }
+.track { height: 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; border-radius: 999px; transform-origin: left; animation: grow 1.2s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleX(0.04); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .fill { animation: none; } }
+.scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.68rem; color: var(--dim); }
+.note { font-size: 0.78rem; color: var(--dim); }
+@media (max-width: 860px) { .research { grid-template-columns: 1fr; } }
+
+/* experience */
+.timeline { display: grid; border-top: 1px solid var(--line); }
+.job { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding-block: 28px; border-bottom: 1px solid var(--line); }
+.job .when { font-family: var(--mono); font-size: var(--step--1); color: var(--muted); display: grid; gap: 8px; align-content: start; }
+.now { font-family: var(--mono); font-size: 0.68rem; color: var(--snfh); border: 1px solid color-mix(in srgb, var(--snfh) 45%, transparent); border-radius: 999px; padding: 2px 8px; width: max-content; }
+.job h3 { font-size: var(--step-1); font-weight: 700; }
+.job .org { color: var(--muted); margin-bottom: 10px; }
+.job ul { margin: 0; padding-left: 18px; color: var(--muted); display: grid; gap: 4px; }
+.job-body { min-width: 0; }
+@media (max-width: 640px) { .job { grid-template-columns: 1fr; gap: 10px; } }
+
+/* projects */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.filter { font: 500 var(--step--1) var(--body); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.filter span { font-family: var(--mono); font-size: 0.72rem; color: var(--dim); margin-left: 4px; }
+.filter:hover { color: var(--fg); border-color: var(--muted); }
+.filter.on { color: #06101f; background: var(--et); border-color: var(--et); }
+.filter.on span { color: #06101f; }
+.projects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.proj {
+  display: grid; grid-template-rows: auto 1fr;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  text-decoration: none; min-width: 0; overflow: hidden;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+a.proj:hover { border-color: var(--et); transform: translateY(-3px); box-shadow: 0 12px 30px -12px rgba(76,154,255,.35); }
+@media (prefers-reduced-motion: reduce) { a.proj:hover { transform: none; } }
+.proj.wide { grid-column: span 3; }
+.art {
+  border-bottom: 1px solid var(--line);
+  background-color: #0f1318;
+  background-image: linear-gradient(#161b21 1px, transparent 1px), linear-gradient(90deg, #161b21 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.art svg { display: block; width: 100%; height: auto; }
+.t-mono { font-family: var(--mono); font-size: 12px; }
+.t-body { font-family: var(--body); font-size: 13px; }
+.t-dim { fill: #6b7580; }
+.proj-body { display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; padding: 20px 22px 22px; }
+.proj .kind { display: flex; justify-content: space-between; gap: 8px; }
+.proj h3 { font-size: var(--step-1); font-weight: 700; }
+.proj p { color: var(--muted); font-size: 0.94rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; }
+.win { color: var(--rc); }
+.arrow { color: var(--dim); font-family: var(--mono); }
+a.proj:hover .arrow { color: var(--et); }
+.more { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.chip { font-size: var(--step--1); color: var(--fg); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+.chip:hover { border-color: var(--et); color: var(--et); }
+
+/* project art motion */
+.ecg { stroke-dasharray: 900; animation: ecg 3s linear infinite; }
+@keyframes ecg { from { stroke-dashoffset: 900; } to { stroke-dashoffset: 0; } }
+.flow { animation: flow 1s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -14; } }
+.glow { animation: glow 1.8s ease-in-out infinite; }
+@keyframes glow { 50% { opacity: .4; } }
+.cursor { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.needle { transform-box: view-box; transform-origin: 200px 180px; animation: needle 2.4s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes needle { from { transform: rotate(-150deg); } to { transform: rotate(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .ecg, .flow, .glow, .cursor, .needle { animation: none; }
+  .packets { display: none; }
+}
+@media (max-width: 900px) { .projects { grid-template-columns: 1fr 1fr; } .proj.wide { grid-column: span 2; } }
+@media (max-width: 600px) { .projects { grid-template-columns: 1fr; } .proj.wide { grid-column: auto; } }
+
+/* terminal line */
+.term { font-family: var(--mono); font-size: var(--step--1); color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; overflow-x: auto; white-space: nowrap; max-width: 100%; }
+.term .p { color: var(--snfh); }
+.term .o { color: var(--fg); }
+.term .k { display: inline-block; width: 8px; height: 1em; background: var(--fg); vertical-align: -2px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
+@media (prefers-reduced-motion: reduce) { .term .k { animation: none; } }
+
+/* skills */
+.skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.skill { background: var(--bg); padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.skill h3 { font-size: var(--step-0); font-weight: 700; font-family: var(--body); }
+@media (max-width: 860px) { .skills { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .skills { grid-template-columns: 1fr; } }
+
+/* education */
+.edu { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.edu .card h3 { font-size: var(--step-2); font-weight: 700; margin-block: 10px 6px; }
+.langs { display: grid; gap: 12px; margin-top: 12px; }
+.langs div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+.langs span { color: var(--muted); }
+@media (max-width: 720px) { .edu { grid-template-columns: 1fr; } }
+
+/* contact */
+.contact { padding-block: 96px 64px; }
+.contact h2 { font-size: var(--step-4); font-weight: 800; letter-spacing: -0.03em; max-width: 14ch; }
+.contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
+.contact-item { display: grid; gap: 10px; align-content: start; }
+.contact-value { font-family: var(--mono); font-size: var(--step-0); word-break: break-all; user-select: all; }
+.copy { justify-self: start; font: 500 0.78rem var(--mono); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+.copy:hover { color: var(--fg); border-color: var(--muted); }
+.copy.done { color: var(--snfh); border-color: var(--snfh); }
+.links { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 760px) { .contact-grid { grid-template-columns: 1fr; } }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 24px; font-family: var(--mono); font-size: 0.75rem; color: var(--dim); }
+</style>
+<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top"><i></i>zaid.nserat</a>
+    <ul>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="label">Amman, Jordan · Open to opportunities</div>
+      <h1>Zaid Nserat<span>.</span></h1>
+      <div class="roles">
+        <span class="role"><i style="background:var(--et)"></i>Data Science &amp; AI</span>
+        <span class="role"><i style="background:var(--snfh)"></i>Data Engineer</span>
+        <span class="role"><i style="background:var(--rc)"></i>Full Stack Developer</span>
+      </div>
+      <p class="lede">I build <b>AI that reads medical scans</b>, <b>data pipelines that run themselves</b>, and the <b>.NET backends</b> that put both in front of users.</p>
+      <div class="term" aria-label="Terminal: whoami"><span class="p">zaid@amman:~$</span> whoami --skills<br><span class="o">ai_engineer · data_engineer · fullstack_dev · kaggle_expert</span><span class="k"></span></div>
+      <div class="cta">
+        <a class="btn primary" href="#projects">See my work</a>
+        <a class="btn" href="#contact">Get in touch</a>
+      </div>
+    </div>
+
+    <div class="viewer-wrap">
+      <div class="viewer" role="img" aria-label="Animated MRI slice with a segmented brain tumor, illustrating the BrainTechAI research">
+        <canvas id="mri"></canvas>
+        <div class="dicom tl"><b>BRAINTECHAI</b><br>Glioma · T1ce<br>Axial</div>
+        <div class="dicom tr">Hashemite Univ.<br>× Brain Tech A<br>BraTS 2024</div>
+        <div class="dicom bl">Mean Dice <b>0.8513</b><br>WT 0.919 · ET 0.846 · TC 0.788</div>
+        <div class="dicom br">SLICE <b id="slice">103</b>/155<br>1.0 mm iso</div>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--netc)"></i>Tumor core</span>
+        <span><i style="background:var(--snfh)"></i>Edema</span>
+        <span><i style="background:var(--et)"></i>Enhancing</span>
+        <span><i style="background:var(--rc)"></i>Cavity</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="vitals">
+  <div class="wrap">
+    <div class="vital"><strong>0.8513</strong><span>Mean Dice, glioma segmentation</span></div>
+    <div class="vital"><strong>Expert</strong><span>Kaggle ranking</span></div>
+    <div class="vital"><strong>4</strong><span>Roles in AI, data &amp; software</span></div>
+    <div class="vital"><strong>2,125</strong><span>MRI cases in the research cohort</span></div>
+  </div>
+</div>
+
+<main>
+  <section class="block wrap" id="research">
+    <div class="sec-head">
+      <div class="label">Research</div>
+      <h2>BrainTechAI</h2>
+      <p>Co-authored research on automatic brain tumor segmentation from MRI, for scans taken both before and after surgery.</p>
+    </div>
+    <div class="research">
+      <article class="card">
+        <div class="label">Paper · Co-author</div>
+        <h3 class="paper-title">Resection-Cavity-Aware Segmentation of Adult Gliomas via nnU-Net and SwinUNETR</h3>
+        <p>The model outlines each part of a glioma on multi-sequence MRI and marks the surgical cavity when one is present. Doctors need that separation to judge how a patient is responding to treatment.</p>
+        <div class="facts">
+          <div><b>2,125</b><span>MRI cases</span></div>
+          <div><b>210</b><span>Held-out test cases</span></div>
+          <div><b>nnU-Net + SwinUNETR</b><span>Model ensemble</span></div>
+          <div><b>FastAPI</b><span>Deployed as a service</span></div>
+        </div>
+        <p class="my-role"><b>My part:</b> software implementation, validation and data curation.</p>
+      </article>
+
+      <article class="card dice" aria-label="Dice scores by tumor region">
+        <div class="dice-head">
+          <div>
+            <div class="label">Mean Dice score</div>
+            <div class="dice-big">0.8513</div>
+          </div>
+          <div class="label" style="text-align:right">1.0 = perfect<br>overlap</div>
+        </div>
+        <div class="bar">
+          <div class="bar-top"><span>Whole tumor</span><b>0.9193</b></div>
+          <div class="track"><div class="fill" style="width:91.93%;background:var(--snfh)"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-top"><span>Enhancing tumor</span><b>0.8462</b></div>
+          <div class="track"><div class="fill" style="width:84.62%;background:var(--et);animation-delay:.12s"></div></div>
+        </div>
+        <div class="bar">
+          <div class="bar-top"><span>Tumor core</span><b>0.7884</b></div>
+          <div class="track"><div class="fill" style="width:78.84%;background:var(--netc);animation-delay:.24s"></div></div>
+        </div>
+        <div class="scale" aria-hidden="true"><span>0</span><span>0.25</span><span>0.5</span><span>0.75</span><span>1.0</span></div>
+        <p class="note">Scored on 210 MRI cases the model never saw during training.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block wrap" id="experience">
+    <div class="sec-head">
+      <div class="label">Experience</div>
+      <h2>Where I've worked</h2>
+    </div>
+    <div class="timeline">
+      <div class="job">
+        <div class="when">Aug 2025 – Present<span class="now">Current</span></div>
+        <div class="job-body">
+          <h3>Full Stack Developer</h3>
+          <div class="org">Carseer</div>
+          <ul>
+            <li>Build full-stack web applications on C# and .NET REST APIs.</li>
+            <li>Design and manage relational databases with Oracle and Toad.</li>
+            <li>Ship RESTful APIs that connect the frontend and backend.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="job">
+        <div class="when">Oct 2024 – Present<span class="now">Current</span></div>
+        <div class="job-body">
+          <h3>AI &amp; Data Science Trainee</h3>
+          <div class="org">AI Coding Academy (Egypt)</div>
+          <ul>
+            <li>Eight-month program in AI, machine learning, NLP and computer vision.</li>
+            <li>Built image classification, text analysis and neural network projects with TensorFlow and Scikit-learn.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="job">
+        <div class="when">Oct 2024 – Apr 2025</div>
+        <div class="job-body">
+          <h3>Intern</h3>
+          <div class="org">Tahaluf AI Emarat Technical Solutions</div>
+          <ul>
+            <li>Hands-on work in statistics, probability, Python and advanced machine learning.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="job">
+        <div class="when">Aug 2023 – Oct 2023</div>
+        <div class="job-body">
+          <h3>Data Scientist Intern</h3>
+          <div class="org">Orange Jordan Coding Academy</div>
+          <ul>
+            <li>Analyzed data and built predictive models with Python and big data tools.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="projects">
+    <div class="sec-head">
+      <div class="label">Projects</div>
+      <h2>Selected work</h2>
+      <p>Machine learning models, data pipelines and the apps that serve them. Each card links to its code.</p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter projects">
+      <button type="button" class="filter on" data-f="all" aria-pressed="true">All <span>12</span></button>
+      <button type="button" class="filter" data-f="ml" aria-pressed="false">AI &amp; ML</button>
+      <button type="button" class="filter" data-f="data" aria-pressed="false">Data Engineering</button>
+      <button type="button" class="filter" data-f="web" aria-pressed="false">Deployed apps</button>
+    </div>
+
+    <div class="projects">
+
+      <a class="proj wide" data-cat="data web" href="https://github.com/zaed-nusirat0/browser-history-ETL-warehouse" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 800 250" role="img" aria-label="Airflow pipeline moving data from SQLite through bronze, silver and gold layers into a dashboard">
+            <text x="24" y="30" class="t-mono t-dim">DAG: browser_history_etl · schedule @hourly · status</text>
+            <rect x="455" y="18" width="62" height="18" rx="9" fill="#123322"/><text x="486" y="31" text-anchor="middle" class="t-mono" fill="#3fd385">success</text>
+            <path id="etl-path" d="M110 135 H690" stroke="#242b34" stroke-width="2" fill="none"/>
+            <g class="t-mono">
+              <rect x="24" y="100" width="120" height="70" rx="8" fill="#171c22" stroke="#2e3742"/>
+              <text x="84" y="130" text-anchor="middle" fill="#e7eaee">SQLite</text><text x="84" y="150" text-anchor="middle" class="t-dim">browser history</text>
+              <rect x="190" y="100" width="110" height="70" rx="8" fill="#1d1712" stroke="#cd7f32"/>
+              <text x="245" y="130" text-anchor="middle" fill="#e2a46a">BRONZE</text><text x="245" y="150" text-anchor="middle" class="t-dim">raw ingest</text>
+              <rect x="345" y="100" width="110" height="70" rx="8" fill="#181b1e" stroke="#c0c6cc"/>
+              <text x="400" y="130" text-anchor="middle" fill="#d6dbe0">SILVER</text><text x="400" y="150" text-anchor="middle" class="t-dim">clean · upsert</text>
+              <rect x="500" y="100" width="110" height="70" rx="8" fill="#1f1b0e" stroke="#ffd23f"/>
+              <text x="555" y="130" text-anchor="middle" fill="#ffd23f">GOLD</text><text x="555" y="150" text-anchor="middle" class="t-dim">star schema</text>
+              <rect x="655" y="100" width="120" height="70" rx="8" fill="#101a2b" stroke="#4c9aff"/>
+              <text x="715" y="130" text-anchor="middle" fill="#4c9aff">Streamlit</text><text x="715" y="150" text-anchor="middle" class="t-dim">+ LLM agent</text>
+            </g>
+            <g class="packets">
+              <circle r="5" fill="#cd7f32"><animateMotion dur="3.2s" repeatCount="indefinite" begin="0s"><mpath href="#etl-path"/></animateMotion></circle>
+              <circle r="5" fill="#c0c6cc"><animateMotion dur="3.2s" repeatCount="indefinite" begin="1.07s"><mpath href="#etl-path"/></animateMotion></circle>
+              <circle r="5" fill="#ffd23f"><animateMotion dur="3.2s" repeatCount="indefinite" begin="2.13s"><mpath href="#etl-path"/></animateMotion></circle>
+            </g>
+            <text x="24" y="220" class="t-mono t-dim">fact_visits ⟶ dim_domain · dim_category · dim_time      watermark: last_visit_time</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">Data Engineering</span><span class="arrow">↗</span></div>
+          <h3>Browsing Behavior Data Warehouse</h3>
+          <p>An end-to-end Bronze → Silver → Gold pipeline on Apache Airflow that loads browser history into a PostgreSQL star schema with incremental upserts. A Streamlit dashboard sits on top, with an LLM agent that answers questions in plain language and writes Arabic reports.</p>
+          <div class="tags"><span class="tag">Airflow</span><span class="tag">PostgreSQL</span><span class="tag">Star schema</span><span class="tag">Streamlit</span><span class="tag">Groq LLM</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml web" href="https://github.com/zaed-nusirat0/Gold-Price-Predictor-AI-Powered-Web-App" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Gold price line chart with a forecast band">
+            <text x="20" y="30" class="t-mono" fill="#ffd23f">XAU / USD</text><text x="380" y="30" text-anchor="end" class="t-mono t-dim">forecast →</text>
+            <polygon points="280,108 300,92 320,84 340,70 360,60 380,50 380,94 360,100 340,102 320,108 300,110" fill="#ffd23f" opacity=".14"/>
+            <polyline points="20,190 40,182 60,186 80,170 100,174 120,160 140,165 160,150 180,138 200,145 220,128 240,120 260,124 280,108" fill="none" stroke="#e8c15a" stroke-width="3" stroke-linejoin="round"/>
+            <polyline points="280,108 300,100 320,96 340,86 360,80 380,72" fill="none" stroke="#ffd23f" stroke-width="3" stroke-dasharray="6 6" class="flow"/>
+            <line x1="280" y1="40" x2="280" y2="215" stroke="#3a4350" stroke-dasharray="3 4"/>
+            <circle cx="380" cy="72" r="6" fill="#ffd23f" class="glow"/>
+            <text x="286" y="212" class="t-mono t-dim">today</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Web app</span><span class="arrow">↗</span></div>
+          <h3>Gold Price Predictor</h3>
+          <p>Forecasts gold prices from historical data with engineered features. A Flask app with interactive charts, hosted on AWS EC2.</p>
+          <div class="tags"><span class="tag">Flask</span><span class="tag">AWS EC2</span><span class="tag">Scikit-learn</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml web" href="https://github.com/zaed-nusirat0/Car-Price-Predictor-AI-Powered-Web-App" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Scatter plot of car prices with a fitted regression line">
+            <text x="20" y="30" class="t-mono t-dim">price ~ year + mileage + brand</text>
+            <rect x="300" y="16" width="82" height="20" rx="10" fill="#2a2410"/><text x="341" y="30" text-anchor="middle" class="t-mono" fill="#ffd23f">TOP SCORE</text>
+            <g fill="#4c9aff" opacity=".75">
+              <circle cx="40" cy="196" r="4"/><circle cx="58" cy="180" r="4"/><circle cx="72" cy="190" r="4"/><circle cx="90" cy="170" r="4"/><circle cx="104" cy="176" r="4"/>
+              <circle cx="120" cy="158" r="4"/><circle cx="138" cy="164" r="4"/><circle cx="150" cy="146" r="4"/><circle cx="170" cy="150" r="4"/><circle cx="186" cy="132" r="4"/>
+              <circle cx="200" cy="140" r="4"/><circle cx="218" cy="120" r="4"/><circle cx="232" cy="128" r="4"/><circle cx="250" cy="108" r="4"/><circle cx="268" cy="114" r="4"/>
+              <circle cx="284" cy="96" r="4"/><circle cx="300" cy="102" r="4"/><circle cx="318" cy="84" r="4"/><circle cx="336" cy="90" r="4"/><circle cx="356" cy="72" r="4"/>
+            </g>
+            <line x1="30" y1="198" x2="372" y2="70" stroke="#ff5f52" stroke-width="3"/>
+            <g transform="translate(296 176)" fill="none" stroke="#8c96a1" stroke-width="2">
+              <path d="M0 22 h70 v-10 l-12 -4 l-10 -12 h-26 l-12 12 h-10 z"/><circle cx="16" cy="24" r="6" fill="#0f1318"/><circle cx="54" cy="24" r="6" fill="#0f1318"/>
+            </g>
+            <text x="20" y="225" class="t-mono t-dim">year →</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Competition</span><span class="arrow">↗</span></div>
+          <h3>Car Price Prediction</h3>
+          <p><span class="win">Highest score among participants.</span> An optimized regression model served through a Flask web app.</p>
+          <div class="tags"><span class="tag">Regression</span><span class="tag">Feature engineering</span><span class="tag">Flask</span></div>
+        </div>
+      </a>
+
+      <div class="proj" data-cat="ml web">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Income prediction with feature importance bars">
+            <text x="20" y="30" class="t-mono t-dim">predict(income_class)</text>
+            <rect x="300" y="16" width="82" height="20" rx="10" fill="#2a2410"/><text x="341" y="30" text-anchor="middle" class="t-mono" fill="#ffd23f">KAGGLE #1</text>
+            <text x="20" y="66" class="t-mono" fill="#e7eaee">&gt;50K</text><rect x="70" y="54" width="300" height="16" rx="8" fill="#171c22"/><rect x="70" y="54" width="246" height="16" rx="8" fill="#3fd385"/><text x="310" y="67" text-anchor="end" class="t-mono" fill="#0b0d10">0.82</text>
+            <text x="20" y="96" class="t-mono t-dim">≤50K</text><rect x="70" y="84" width="300" height="16" rx="8" fill="#171c22"/><rect x="70" y="84" width="54" height="16" rx="8" fill="#5c6670"/><text x="132" y="97" class="t-mono t-dim">0.18</text>
+            <text x="20" y="136" class="t-mono t-dim">feature importance</text>
+            <g class="t-mono t-dim">
+              <text x="20" y="160">education</text><rect x="140" y="150" width="200" height="12" rx="3" fill="#4c9aff"/>
+              <text x="20" y="182">capital_gain</text><rect x="140" y="172" width="160" height="12" rx="3" fill="#4c9aff" opacity=".8"/>
+              <text x="20" y="204">age</text><rect x="140" y="194" width="120" height="12" rx="3" fill="#4c9aff" opacity=".6"/>
+              <text x="20" y="226">hours_per_week</text><rect x="140" y="216" width="90" height="12" rx="3" fill="#4c9aff" opacity=".45"/>
+            </g>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Kaggle</span></div>
+          <h3>Income Evaluation</h3>
+          <p><span class="win">Highest score on Kaggle.</span> A complete data processing pipeline plus a Flask app that predicts income category.</p>
+          <div class="tags"><span class="tag">Classification</span><span class="tag">Pipelines</span><span class="tag">Flask</span></div>
+        </div>
+      </div>
+
+      <a class="proj" data-cat="ml web" href="https://github.com/zaed-nusirat0/Intent-Detection-Model-API---99-Accuracy" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Chat message classified into intents with confidence scores">
+            <rect x="110" y="22" width="272" height="44" rx="14" fill="#1b2a44"/>
+            <text x="126" y="50" class="t-body" fill="#e7eaee">Book me a flight to Amman tomorrow</text>
+            <text x="20" y="96" class="t-mono t-dim">intent ⟶ confidence</text>
+            <g class="t-mono">
+              <text x="20" y="126" fill="#3fd385">book_flight</text><rect x="140" y="114" width="200" height="14" rx="7" fill="#171c22"/><rect x="140" y="114" width="198" height="14" rx="7" fill="#3fd385"/><text x="380" y="126" text-anchor="end" fill="#3fd385">0.99</text>
+              <text x="20" y="156" class="t-dim">check_weather</text><rect x="140" y="144" width="200" height="14" rx="7" fill="#171c22"/><rect x="140" y="144" width="6" height="14" rx="3" fill="#5c6670"/><text x="380" y="156" text-anchor="end" class="t-dim">0.01</text>
+              <text x="20" y="186" class="t-dim">cancel_booking</text><rect x="140" y="174" width="200" height="14" rx="7" fill="#171c22"/><rect x="140" y="174" width="3" height="14" rx="2" fill="#5c6670"/><text x="380" y="186" text-anchor="end" class="t-dim">0.00</text>
+            </g>
+            <text x="20" y="224" class="t-mono" fill="#4c9aff">accuracy 99%</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">NLP · API</span><span class="arrow">↗</span></div>
+          <h3>Intent Detection API</h3>
+          <p>Works out what a user wants from a single message, served behind an API with 99% accuracy.</p>
+          <div class="tags"><span class="tag">NLP</span><span class="tag">Text classification</span><span class="tag">REST API</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="data ml" href="https://github.com/zaed-nusirat0/ETL-RECOMMENDATION-SYSTEM" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Graph linking users to recommended items">
+            <text x="20" y="30" class="t-mono t-dim">users ⟶ items</text>
+            <g stroke="#2e3742" stroke-width="1.5">
+              <line x1="80" y1="70" x2="306" y2="56"/><line x1="80" y1="70" x2="306" y2="112"/><line x1="80" y1="130" x2="306" y2="56"/>
+              <line x1="80" y1="130" x2="306" y2="168"/><line x1="80" y1="190" x2="306" y2="112"/><line x1="80" y1="190" x2="306" y2="214"/>
+            </g>
+            <line x1="80" y1="130" x2="306" y2="112" stroke="#3fd385" stroke-width="3" stroke-dasharray="8 6" class="flow"/>
+            <g class="t-mono">
+              <circle cx="80" cy="70" r="14" fill="#171c22" stroke="#4c9aff"/><circle cx="80" cy="130" r="16" fill="#123322" stroke="#3fd385" stroke-width="2"/><circle cx="80" cy="190" r="14" fill="#171c22" stroke="#4c9aff"/>
+              <text x="54" y="134" text-anchor="end" fill="#3fd385">u42</text>
+              <rect x="306" y="44" width="28" height="24" rx="5" fill="#171c22" stroke="#5c6670"/><rect x="306" y="100" width="28" height="24" rx="5" fill="#123322" stroke="#3fd385" stroke-width="2"/>
+              <rect x="306" y="156" width="28" height="24" rx="5" fill="#171c22" stroke="#5c6670"/><rect x="306" y="202" width="28" height="24" rx="5" fill="#171c22" stroke="#5c6670"/>
+              <text x="342" y="117" fill="#3fd385">0.93</text>
+            </g>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">Data Engineering · ML</span><span class="arrow">↗</span></div>
+          <h3>ETL Recommendation System</h3>
+          <p>An ETL pipeline that prepares interaction data and feeds a recommendation engine.</p>
+          <div class="tags"><span class="tag">ETL</span><span class="tag">Recommenders</span><span class="tag">Python</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml" href="https://github.com/zaed-nusirat0/Car-Centers-Sentiment-Analysis" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Customer reviews labelled positive and negative">
+            <text x="20" y="30" class="t-mono t-dim">reviews · car service centers</text>
+            <rect x="20" y="48" width="290" height="40" rx="10" fill="#171c22"/><text x="36" y="73" class="t-body" fill="#e7eaee">Great service, car ready on time</text>
+            <rect x="320" y="56" width="62" height="24" rx="12" fill="#123322"/><text x="351" y="72" text-anchor="middle" class="t-mono" fill="#3fd385">POS</text>
+            <rect x="20" y="100" width="290" height="40" rx="10" fill="#171c22"/><text x="36" y="125" class="t-body" fill="#e7eaee">Waited three hours, no update</text>
+            <rect x="320" y="108" width="62" height="24" rx="12" fill="#331614"/><text x="351" y="124" text-anchor="middle" class="t-mono" fill="#ff5f52">NEG</text>
+            <rect x="20" y="152" width="290" height="40" rx="10" fill="#171c22"/><text x="36" y="177" class="t-body" fill="#e7eaee">Fair price and friendly staff</text>
+            <rect x="320" y="160" width="62" height="24" rx="12" fill="#123322"/><text x="351" y="176" text-anchor="middle" class="t-mono" fill="#3fd385">POS</text>
+            <rect x="20" y="210" width="240" height="8" rx="4" fill="#3fd385"/><rect x="264" y="210" width="116" height="8" rx="4" fill="#ff5f52"/>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">NLP</span><span class="arrow">↗</span></div>
+          <h3>Car Centers Sentiment Analysis</h3>
+          <p>Reads customer reviews of car service centers and labels each one as positive or negative.</p>
+          <div class="tags"><span class="tag">NLP</span><span class="tag">Sentiment</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml" href="https://github.com/zaed-nusirat0/Face-Mask-Detection" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Two faces with detection boxes, one wearing a mask">
+            <text x="20" y="30" class="t-mono t-dim">CNN · live detection</text>
+            <ellipse cx="120" cy="134" rx="52" ry="62" fill="#2a3038"/>
+            <circle cx="100" cy="119" r="5" fill="#0f1318"/><circle cx="140" cy="119" r="5" fill="#0f1318"/>
+            <path d="M74 136 Q120 128 166 136 L160 172 Q120 190 80 172 Z" fill="#9fd3ff"/>
+            <path d="M80 146 H160 M82 158 H158" stroke="#6aa9de" stroke-width="2"/>
+            <rect x="58" y="62" width="124" height="146" rx="4" fill="none" stroke="#3fd385" stroke-width="2.5" class="glow"/>
+            <rect x="58" y="44" width="92" height="18" fill="#3fd385"/><text x="64" y="57" class="t-mono" fill="#0b0d10">mask 0.97</text>
+            <ellipse cx="290" cy="134" rx="52" ry="62" fill="#2a3038"/>
+            <circle cx="270" cy="119" r="5" fill="#0f1318"/><circle cx="310" cy="119" r="5" fill="#0f1318"/>
+            <path d="M272 164 Q290 174 308 164" stroke="#0f1318" stroke-width="4" fill="none"/>
+            <rect x="228" y="62" width="124" height="146" rx="4" fill="none" stroke="#ff5f52" stroke-width="2.5" class="glow"/>
+            <rect x="228" y="44" width="110" height="18" fill="#ff5f52"/><text x="234" y="57" class="t-mono" fill="#0b0d10">no_mask 0.91</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">Computer Vision</span><span class="arrow">↗</span></div>
+          <h3>Face Mask Detection</h3>
+          <p>A convolutional neural network that finds faces and tells whether each one is wearing a mask.</p>
+          <div class="tags"><span class="tag">CNN</span><span class="tag">TensorFlow</span><span class="tag">Computer vision</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml" href="https://github.com/zaed-nusirat0/Email-Spam-Classification-NLP" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Inbox with one email flagged as spam">
+            <text x="20" y="30" class="t-mono t-dim">inbox · 4 new</text>
+            <rect x="20" y="44" width="360" height="38" rx="6" fill="#171c22"/><circle cx="42" cy="63" r="9" fill="#2e3742"/><rect x="60" y="56" width="120" height="6" rx="3" fill="#8c96a1"/><rect x="60" y="68" width="200" height="5" rx="2.5" fill="#3a4350"/>
+            <rect x="20" y="90" width="360" height="38" rx="6" fill="#2a1513" stroke="#ff5f52"/><circle cx="42" cy="109" r="9" fill="#5a2420"/><text x="60" y="107" class="t-body" fill="#ffb0a8">YOU WON $1,000,000 !!!</text><rect x="60" y="114" width="150" height="5" rx="2.5" fill="#5a2420"/>
+            <rect x="296" y="99" width="76" height="20" rx="10" fill="#ff5f52"/><text x="334" y="113" text-anchor="middle" class="t-mono" fill="#0b0d10">SPAM .98</text>
+            <rect x="20" y="136" width="360" height="38" rx="6" fill="#171c22"/><circle cx="42" cy="155" r="9" fill="#2e3742"/><rect x="60" y="148" width="100" height="6" rx="3" fill="#8c96a1"/><rect x="60" y="160" width="230" height="5" rx="2.5" fill="#3a4350"/>
+            <rect x="20" y="182" width="360" height="38" rx="6" fill="#171c22"/><circle cx="42" cy="201" r="9" fill="#2e3742"/><rect x="60" y="194" width="140" height="6" rx="3" fill="#8c96a1"/><rect x="60" y="206" width="180" height="5" rx="2.5" fill="#3a4350"/>
+            <text x="370" y="68" text-anchor="end" class="t-mono" fill="#3fd385">ham</text><text x="370" y="160" text-anchor="end" class="t-mono" fill="#3fd385">ham</text><text x="370" y="206" text-anchor="end" class="t-mono" fill="#3fd385">ham</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">NLP</span><span class="arrow">↗</span></div>
+          <h3>Spam Email Classification</h3>
+          <p>Separates spam from real mail using text features and an NLP classifier.</p>
+          <div class="tags"><span class="tag">NLP</span><span class="tag">Classification</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml" href="https://github.com/zaed-nusirat0/Heart-Disease-" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="ECG heartbeat line with a predicted risk score">
+            <text x="20" y="30" class="t-mono t-dim">patient #0217 · ECG</text>
+            <rect x="290" y="16" width="92" height="20" rx="10" fill="#123322"/><text x="336" y="30" text-anchor="middle" class="t-mono" fill="#3fd385">risk 0.12</text>
+            <polyline class="ecg" points="0,130 50,130 62,122 74,130 92,130 100,142 108,56 116,176 124,130 150,130 166,116 182,130 200,130 212,122 224,130 242,130 250,142 258,56 266,176 274,130 300,130 316,116 332,130 350,130 362,122 374,130 400,130" fill="none" stroke="#ff5f52" stroke-width="3" stroke-linejoin="round"/>
+            <g class="t-mono t-dim"><text x="20" y="214">age 54</text><text x="110" y="214">chol 212</text><text x="210" y="214">bp 128/82</text><text x="320" y="214">hr 72</text></g>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Health</span><span class="arrow">↗</span></div>
+          <h3>Heart Disease Prediction</h3>
+          <p>Estimates heart disease risk from clinical measurements such as age, cholesterol and blood pressure.</p>
+          <div class="tags"><span class="tag">Classification</span><span class="tag">Scikit-learn</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml" href="https://github.com/zaed-nusirat0/Loan-Prediction" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="Loan approval gauge pointing to approved">
+            <text x="20" y="30" class="t-mono t-dim">loan_application #A-381</text>
+            <path d="M100 180 A100 100 0 0 1 150 93.4" stroke="#ff5f52" stroke-width="16" fill="none"/>
+            <path d="M150 93.4 A100 100 0 0 1 250 93.4" stroke="#ffd23f" stroke-width="16" fill="none"/>
+            <path d="M250 93.4 A100 100 0 0 1 300 180" stroke="#3fd385" stroke-width="16" fill="none"/>
+            <line x1="200" y1="180" x2="278" y2="146" stroke="#e7eaee" stroke-width="4" stroke-linecap="round" class="needle"/>
+            <circle cx="200" cy="180" r="9" fill="#e7eaee"/>
+            <text x="200" y="218" text-anchor="middle" class="t-mono" fill="#3fd385">APPROVED · 0.87</text>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Finance</span><span class="arrow">↗</span></div>
+          <h3>Loan Prediction</h3>
+          <p>Predicts whether a loan application should be approved from the applicant's profile.</p>
+          <div class="tags"><span class="tag">Classification</span><span class="tag">Pandas</span></div>
+        </div>
+      </a>
+
+      <a class="proj" data-cat="ml web" href="https://github.com/zaed-nusirat0/Fast-Api-diabetes" target="_blank" rel="noopener">
+        <div class="art">
+          <svg viewBox="0 0 400 240" role="img" aria-label="API request and JSON response for a diabetes prediction">
+            <g class="t-mono">
+              <rect x="20" y="18" width="52" height="20" rx="4" fill="#3fd385"/><text x="46" y="32" text-anchor="middle" fill="#0b0d10">POST</text>
+              <text x="82" y="32" fill="#e7eaee">/predict</text><text x="380" y="32" text-anchor="end" fill="#3fd385">200 OK</text>
+              <text x="20" y="66" fill="#8c96a1">{</text>
+              <text x="36" y="86"><tspan fill="#4c9aff">"glucose"</tspan><tspan fill="#8c96a1">: </tspan><tspan fill="#ffd23f">148</tspan><tspan fill="#8c96a1">,</tspan></text>
+              <text x="36" y="106"><tspan fill="#4c9aff">"bmi"</tspan><tspan fill="#8c96a1">: </tspan><tspan fill="#ffd23f">33.6</tspan><tspan fill="#8c96a1">,</tspan></text>
+              <text x="36" y="126"><tspan fill="#4c9aff">"age"</tspan><tspan fill="#8c96a1">: </tspan><tspan fill="#ffd23f">50</tspan></text>
+              <text x="20" y="146" fill="#8c96a1">}</text>
+              <line x1="20" y1="162" x2="380" y2="162" stroke="#242b34"/>
+              <text x="20" y="188" fill="#8c96a1">→ {</text>
+              <text x="36" y="208"><tspan fill="#4c9aff">"diabetic"</tspan><tspan fill="#8c96a1">: </tspan><tspan fill="#ff5f52">true</tspan><tspan fill="#8c96a1">, </tspan><tspan fill="#4c9aff">"probability"</tspan><tspan fill="#8c96a1">: </tspan><tspan fill="#ffd23f">0.74</tspan></text>
+              <text x="20" y="228" fill="#8c96a1">}</text><rect x="32" y="218" width="8" height="13" fill="#e7eaee" class="cursor"/>
+            </g>
+          </svg>
+        </div>
+        <div class="proj-body">
+          <div class="kind"><span class="label">ML · Deployment</span><span class="arrow">↗</span></div>
+          <h3>Diabetes Model + FastAPI</h3>
+          <p>A diabetes prediction model served as a FastAPI endpoint that answers with JSON.</p>
+          <div class="tags"><span class="tag">FastAPI</span><span class="tag">Model serving</span></div>
+        </div>
+      </a>
+
+    </div>
+    <div class="more">
+      <a class="chip" href="https://github.com/zaed-nusirat0?tab=repositories" target="_blank" rel="noopener">See all repositories on GitHub ↗</a>
+    </div>
+  </section>
+
+  <section class="block wrap" id="skills">
+    <div class="sec-head">
+      <div class="label">Skills</div>
+      <h2>Toolkit</h2>
+    </div>
+    <div class="skills">
+      <div class="skill"><h3>Machine Learning &amp; AI</h3><div class="tags"><span class="tag">Python</span><span class="tag">PyTorch</span><span class="tag">TensorFlow</span><span class="tag">Scikit-learn</span><span class="tag">MONAI</span><span class="tag">CNNs</span><span class="tag">Vision Transformers</span><span class="tag">NLP</span></div></div>
+      <div class="skill"><h3>Medical Imaging</h3><div class="tags"><span class="tag">3D segmentation</span><span class="tag">nnU-Net</span><span class="tag">SwinUNETR</span><span class="tag">BraTS</span><span class="tag">MRI preprocessing</span></div></div>
+      <div class="skill"><h3>Data Engineering &amp; MLOps</h3><div class="tags"><span class="tag">Apache Airflow</span><span class="tag">ETL / ELT</span><span class="tag">Star schema</span><span class="tag">Scrapy</span><span class="tag">Docker</span><span class="tag">MLOps</span></div></div>
+      <div class="skill"><h3>Web &amp; Backend</h3><div class="tags"><span class="tag">C#</span><span class="tag">.NET REST API</span><span class="tag">Flask</span><span class="tag">FastAPI</span><span class="tag">Streamlit</span></div></div>
+      <div class="skill"><h3>Databases</h3><div class="tags"><span class="tag">SQL</span><span class="tag">PostgreSQL</span><span class="tag">Oracle</span><span class="tag">Toad</span></div></div>
+      <div class="skill"><h3>Cloud</h3><div class="tags"><span class="tag">AWS EC2</span><span class="tag">AWS S3</span><span class="tag">RunPod GPU</span><span class="tag">Model deployment</span></div></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="education">
+    <div class="sec-head">
+      <div class="label">Education</div>
+      <h2>Background</h2>
+    </div>
+    <div class="edu">
+      <div class="card">
+        <div class="label">2021 – 2025</div>
+        <h3>B.Sc. in Data Science &amp; AI</h3>
+        <p>Hashemite University, Zarqa, Jordan</p>
+      </div>
+      <div class="card">
+        <div class="label">Languages</div>
+        <div class="langs">
+          <div><b>Arabic</b><span>Native</span></div>
+          <div><b>English</b><span>Professional</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact wrap" id="contact">
+    <div class="label">Contact</div>
+    <h2>Let's build something together.</h2>
+    <div class="contact-grid">
+      <div class="card contact-item">
+        <div class="label">Email</div>
+        <div class="contact-value" id="email">zm463454@gmail.com</div>
+        <button class="copy" type="button" data-copy="email">Copy</button>
+      </div>
+      <div class="card contact-item">
+        <div class="label">Phone</div>
+        <div class="contact-value" id="phone">+962 78 687 0002</div>
+        <button class="copy" type="button" data-copy="phone">Copy</button>
+      </div>
+      <div class="card contact-item">
+        <div class="label">Profiles</div>
+        <div class="links">
+          <a class="chip" href="https://www.linkedin.com/in/zaid-nusirat-192a7a275/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="chip" href="https://github.com/zaed-nusirat0" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="chip" href="https://kaggle.com/zaed2003" target="_blank" rel="noopener">Kaggle ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Zaid Nserat</span>
+    <span>Amman, Jordan</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Copy buttons
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var el = document.getElementById(btn.dataset.copy);
+      var text = el.textContent.trim();
+      function done() { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1600); }
+      function fallback() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press Ctrl+C"; }
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  // Project filters
+  var filters = document.querySelectorAll(".filter");
+  var cards = document.querySelectorAll(".proj");
+  filters.forEach(function (b) {
+    b.addEventListener("click", function () {
+      var f = b.dataset.f;
+      filters.forEach(function (x) { var on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on ? "true" : "false"); });
+      cards.forEach(function (c) { c.hidden = !(f === "all" || c.dataset.cat.split(" ").indexOf(f) > -1); });
+    });
+  });
+
+  // Generated MRI slice with a segmented tumor
+  var canvas = document.getElementById("mri");
+  var ctx = canvas.getContext("2d");
+  var sliceEl = document.getElementById("slice");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var base = document.createElement("canvas");
+  var S = 0;
+
+  function rnd(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+
+  function blob(c, cx, cy, r, wob, seed, n) {
+    var R = rnd(seed), ph = [R() * 6, R() * 6, R() * 6];
+    c.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = i / n * Math.PI * 2;
+      var k = r * (1 + wob * (0.5 * Math.sin(3 * a + ph[0]) + 0.3 * Math.sin(5 * a + ph[1]) + 0.2 * Math.sin(8 * a + ph[2])));
+      var x = cx + Math.cos(a) * k, y = cy + Math.sin(a) * k * 1.12;
+      i ? c.lineTo(x, y) : c.moveTo(x, y);
+    }
+    c.closePath();
+  }
+
+  function drawBase() {
+    var c = base.getContext("2d");
+    var cx = S / 2, cy = S / 2, R = S * 0.36;
+    c.fillStyle = "#000"; c.fillRect(0, 0, S, S);
+    // skull rim
+    blob(c, cx, cy, R * 1.12, 0.02, 7, 240);
+    c.strokeStyle = "rgba(210,215,220,0.55)"; c.lineWidth = S * 0.012; c.stroke();
+    // brain parenchyma
+    blob(c, cx, cy, R, 0.03, 11, 240);
+    var g = c.createRadialGradient(cx, cy, R * 0.1, cx, cy, R);
+    g.addColorStop(0, "#8d9298"); g.addColorStop(0.7, "#6f757b"); g.addColorStop(1, "#4b5056");
+    c.fillStyle = g; c.fill();
+    c.save(); c.clip();
+    // gyri: folded contours
+    var Rn = rnd(42);
+    for (var j = 0; j < 46; j++) {
+      var rr = R * (0.32 + 0.66 * (j / 46));
+      var f = 14 + Math.floor(Rn() * 10), ph = Rn() * 6, amp = 0.05 + Rn() * 0.04;
+      c.beginPath();
+      for (var i = 0; i <= 360; i++) {
+        var a = i / 360 * Math.PI * 2;
+        var k = rr * (1 + amp * Math.sin(f * a + ph));
+        var x = cx + Math.cos(a) * k, y = cy + Math.sin(a) * k * 1.12;
+        i ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
+      c.strokeStyle = j % 2 ? "rgba(30,33,37,0.32)" : "rgba(200,205,210,0.16)";
+      c.lineWidth = S * 0.006; c.stroke();
+    }
+    // midline
+    c.beginPath(); c.moveTo(cx, cy - R * 1.15); c.lineTo(cx, cy + R * 1.15);
+    c.strokeStyle = "rgba(10,10,12,0.75)"; c.lineWidth = S * 0.008; c.stroke();
+    // ventricles
+    c.fillStyle = "#16181b";
+    blob(c, cx - R * 0.13, cy - R * 0.05, R * 0.1, 0.25, 3, 90); c.fill();
+    blob(c, cx + R * 0.13, cy - R * 0.05, R * 0.1, 0.25, 5, 90); c.fill();
+    // grain
+    var img = c.getImageData(0, 0, S, S), d = img.data, Rg = rnd(9);
+    for (var p = 0; p < d.length; p += 4) { var n = (Rg() - 0.5) * 22; d[p] += n; d[p + 1] += n; d[p + 2] += n; }
+    c.putImageData(img, 0, 0);
+    c.restore();
+  }
+
+  function size() {
+    var w = canvas.clientWidth, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    S = Math.max(240, Math.round(w * dpr));
+    canvas.width = canvas.height = base.width = base.height = S;
+    drawBase();
+  }
+
+  function frame(t) {
+    var cx = S / 2, cy = S / 2, R = S * 0.36;
+    var tx = cx + R * 0.34, ty = cy - R * 0.2;
+    var pulse = reduce ? 1 : 0.85 + 0.15 * Math.sin(t / 900);
+    ctx.drawImage(base, 0, 0);
+    // edema
+    blob(ctx, tx, ty, R * 0.34, 0.22, 21, 120);
+    ctx.fillStyle = "rgba(63,211,133," + (0.42 * pulse) + ")"; ctx.fill();
+    // cavity
+    blob(ctx, tx - R * 0.06, ty + R * 0.08, R * 0.1, 0.2, 31, 80);
+    ctx.fillStyle = "rgba(255,210,63," + (0.6 * pulse) + ")"; ctx.fill();
+    // enhancing rim
+    blob(ctx, tx + R * 0.04, ty - R * 0.04, R * 0.17, 0.18, 27, 100);
+    ctx.lineWidth = S * 0.018; ctx.strokeStyle = "rgba(76,154,255," + (0.9 * pulse) + ")"; ctx.stroke();
+    // necrotic core
+    blob(ctx, tx + R * 0.04, ty - R * 0.04, R * 0.085, 0.25, 29, 80);
+    ctx.fillStyle = "rgba(255,95,82," + (0.75 * pulse) + ")"; ctx.fill();
+    // crosshair
+    ctx.strokeStyle = "rgba(255,255,255,0.18)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(tx, 0); ctx.lineTo(tx, S); ctx.moveTo(0, ty); ctx.lineTo(S, ty); ctx.stroke();
+    // scan line
+    if (!reduce) {
+      var y = ((t / 28) % (S * 1.2)) - S * 0.1;
+      var sg = ctx.createLinearGradient(0, y - S * 0.06, 0, y);
+      sg.addColorStop(0, "rgba(76,154,255,0)"); sg.addColorStop(1, "rgba(76,154,255,0.22)");
+      ctx.fillStyle = sg; ctx.fillRect(0, y - S * 0.06, S, S * 0.06);
+      ctx.fillStyle = "rgba(160,200,255,0.6)"; ctx.fillRect(0, y, S, Math.max(1, S * 0.002));
+      sliceEl.textContent = String(60 + Math.floor((t / 400) % 90));
+      requestAnimationFrame(frame);
+    }
+  }
+
+  size();
+  frame(0);
+  if (!reduce) requestAnimationFrame(frame);
+  var to; window.addEventListener("resize", function () { clearTimeout(to); to = setTimeout(function () { size(); frame(performance.now()); }, 150); });
+})();
+</script>
+
+</body>
+</html>
